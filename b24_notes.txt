@@ -1,0 +1,6 @@
+Strand 1: 
+- first word should be 45541
+ - stuck parity
+
+ Strand 3:
+ - 

@@ -1,0 +1,4 @@
+24,7225 should be 51365 0
+24,7305 should be 03516 0
+24,7327 should be 03320 0
+24,7365 should be 02212 1
