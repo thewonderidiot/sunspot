@@ -51,7 +51,7 @@
 04,6062  06033 1          TC     12BITSOK
 04,6063  30573 0          XCH    EXECTEM2
 04,6064  74606 1          MASK   LOW10
-04,6065  64373 1          AD     4373
+04,6065  64373 1          AD     6K
 04,6066  40000 0          COM
 04,6067  20601 1 LOCSET   INDEX  LOCCTR
 04,6070  50120 1          TS     LOC
@@ -411,7 +411,7 @@
 04,6632  60001 0          AD     Q
 04,6633  50643 0          TS     STATE
 04,6634  10001 1          CCS    Q
-04,6635  06642 1          TC     6642                ; FIXME BIT 13 WAS HIGH
+04,6635  06642 1          TC     PRGSLEEP            ; FIXME BIT 13 WAS HIGH
 04,6636  36651 0          CAF    LPRGRET
 04,6637  02146 0          TC     JOBWAKE
 04,6640  20016 1          RELINT 
@@ -425,27 +425,27 @@
 04,6650  05723 1          TC     BANKJUMP
 04,6651  10647 0 LPRGRET  CADR   PRGRET
 04,6652  50413 1 UPTCADR  CADR   U24,6413
-04,6653  10000 0 MODROUT  CCS    A
-04,6654  06657 0          TC     +3
-04,6655  60646 0          AD     PHASE1
+04,6653  10000 0 MODROUT  CCS    A                   ; PROGRAM 00 REQUESTED?
+04,6654  06657 0          TC     +3                  ; NO
+04,6655  60646 0          AD     UNK0646             ; GO TO CURRENT P00 ADDRESS
 04,6656  05662 0          TC     SWCALL
-04,6657  64516 1          AD     ONE
+04,6657  64516 1          AD     ONE                 ; RESTORE PROGRAM NUMBER AFTER CCS
 04,6660  40000 0          COM
-04,6661  50115 1          TS     MPAC
+04,6661  50115 1          TS     MPAC                ; MPAC = - PROGRAM NUMBER
 04,6662  32057 1          CAF    EIGHTN
-04,6663  50116 1 U04,6663 TS     MPAC +1
+04,6663  50116 1 U04,6663 TS     MPAC +1             ; MPAC +1 = INDEX INTO MM TABLES
 04,6664  20000 0          INDEX  A
 04,6665  37005 0          CAF    PREMM1
-04,6666  50117 0          TS     MPAC +2
+04,6666  50117 0          TS     MPAC +2             ; LOAD PROGRAM DATA INTO MPAC +2
 04,6667  76673 1          MASK   LOW6
 04,6670  60115 1          AD     MPAC
-04,6671  10000 0          CCS    A
-04,6672  06762 1          TC     U04,6762
+04,6671  10000 0          CCS    A                   ; DO BOTTOM 6 BITS MATCH TABLE ENTRY?
+04,6672  06762 1          TC     U04,6762            ; NO
 04,6673  00077 1 LOW6     OCT    77                  ; MAY NEED TO CHANGE NAME
-04,6674  06762 1          TC     U04,6762
-04,6675  34500 0          CAF    BIT15
+04,6674  06762 1          TC     U04,6762            ; NO
+04,6675  34500 0          CAF    BIT15               ; FOUND IT. CYL = BIT1
 04,6676  50022 1          TS     CYL
-04,6677  36771 0          CAF    U04,6771
+04,6677  36771 0          CAF    U04,6771            ; INDEX INTO U04,6772
 04,6700  20017 0          INHINT 
 04,6701  50577 1 U04,6701 TS     ITEMP1
 04,6702  20000 0          INDEX  A
@@ -453,29 +453,29 @@
 04,6704  76673 1          MASK   LOW6
 04,6705  25777 1          EXTEND 
 04,6706  60612 1          SU     MODREG
-04,6707  10000 0          CCS    A
-04,6710  06765 0          TC     U04,6765
+04,6707  10000 0          CCS    A                   ; DO LOW 6 BITS MATCH CURRENT MODE?
+04,6710  06765 0          TC     U04,6765            ; NO
 04,6711  06734 1 U04,6711 TC     U04,6734
-04,6712  06765 0          TC     U04,6765
-04,6713  20116 0          INDEX  MPAC +1             ; ENTRY IN TABLE MATCHES MODREG
+04,6712  06765 0          TC     U04,6765            ; NO
+04,6713  20116 0          INDEX  MPAC +1             ; YES: ENTRY IN TABLE MATCHES MODREG
 04,6714  37030 0          CAF    U04,7030
 04,6715  70022 0          MASK   CYL
 04,6716  10000 0          CCS    A
 04,6717  06722 0          TC     +3
-04,6720  03444 0 U04,6720 TC     UNK3444
+04,6720  03444 0 U04,6720 TC     FALTON              ; MM SELECTION HAS FAILED
 04,6721  02212 1          TC     ENDOFJOB
 04,6722  20116 0          INDEX  MPAC +1
-04,6723  37053 0          CAF    FCADRMM1
+04,6723  37053 0          CAF    FCADRMM1            ; MPAC +5 = MM CADR
 04,6724  50122 0          TS     MPAC +5
-04,6725  36711 0          CAF    U04,6711
+04,6725  36711 0          CAF    U04,6711            ; MPAC +6 = JUMP TO U04,6734
 04,6726  50123 1          TS     MPAC +6
-04,6727  33437 1          CAF    UNK3437
+04,6727  33437 1          CAF    TCFINDVC            ; MPAC +4 = TC FINDVAC
 04,6730  50121 0          TS     MPAC +4
-04,6731  32260 1          CAF    PRIO37
+04,6731  32260 1          CAF    PRIO37              ; A + PRIORITY OF JOB
 04,6732  70117 1          MASK   MPAC +2
 04,6733  00121 0          TC     MPAC +4
 04,6734  30022 1 U04,6734 XCH    CYL
-04,6735  20601 1          INDEX  PHASDATA            ; FIXME IS THIS WORD RIGHT?
+04,6735  20601 1          INDEX  LOCCTR
 04,6736  50115 1          TS     MPAC
 04,6737  34506 0          CAF    BIT9
 04,6740  25777 1          EXTEND 
@@ -496,20 +496,20 @@
 04,6757  16002 1          CADR   NVSUBSYB            ; FIXME
 04,6760  05720 1 U04,6760 TC     POSTJUMP
 04,6761  15527 0          CADR   U06,7527
-04,6762  10116 0 U04,6762 CCS    MPAC +1
+04,6762  10116 0 U04,6762 CCS    MPAC +1             ; DECREMENT/LOOP MM TABLE INDEX
 04,6763  06663 1          TC     U04,6663
-04,6764  06720 1          TC     U04,6720
+04,6764  06720 1          TC     U04,6720            ; REACHED END OF TABLE WITHOUT FINDING MM
 04,6765  40022 0 U04,6765 CS     CYL
 04,6766  10577 0          CCS    ITEMP1
 04,6767  06701 1          TC     U04,6701
 04,6770  06720 1          TC     U04,6720
-04,6771  00012 1 U04,6671 DEC    10                  ; LOOP COUNT
-04,6772  00022 1 U04,6672 TC     0022
+04,6771  00012 1 U04,6771 DEC    10                  ; LOOP COUNT
+04,6772  00022 1 U04,6772 TC     0022
 04,6773  00046 0          TC     0046
 04,6774  00042 1          TC     0042
 04,6775  00033 1          TC     0033
 04,6776  00032 0          TC     0032
-04,6777  10030 0          CCS    0030
+04,6777  00031 0          TC     0031                ; FIXME: BIT 13 WAS SET
 04,7000  00071 1          TC     0071
 04,7001  00053 1          TC     0053
 04,7002  00012 1          TC     0012
@@ -583,12 +583,12 @@
 04,7106  35501 0          CAF    ZERO
 04,7107  51765 1          TS     ERCOUNT
 04,7110  07415 0          TC     STARTSUB
-04,7111  37574 0          CAF    U04,7574
+04,7111  37574 0          CAF    SWINIT
 04,7112  50643 0          TS     STATE
-04,7113  37575 1          CAF    U04,7575
-04,7114  50644 1          TS     FLAGWRD1
-04,7115  37576 1          CAF    U04,7576
-04,7116  50645 0          TS     FLAGWRD2
+04,7113  37575 1          CAF    SWINIT +1
+04,7114  50644 1          TS     STATE +1
+04,7115  37576 1          CAF    SWINIT +2
+04,7116  50645 0          TS     STATE +2
 04,7117  34477 1 NOGO     CAF    MAXPROG
 04,7120  50077 1          TS     BUF
 04,7121  44516 0          CS     ONE
@@ -627,7 +627,7 @@
 04,7162  07332 1          TC     ENDFRESH
 04,7163  32246 0          CAF    PRIO25
 04,7164  02134 0          TC     FINDVAC
-04,7165  77777 0          CADR   -
+04,7165  77777 0          CADR   -                   ; FIXME
 04,7166  07332 1          TC     ENDFRESH
 04,7167  37557 1 KENABLE  CAF    OCT50
 04,7170  50726 1          TS     WASKSET
@@ -636,7 +636,7 @@
 04,7173  30207 1          CADR   IFAILOK
 04,7174  02344 0          TC     TASKOVER
 04,7175  00120 1 BITS5&7  OCT    120
-04,7176  02465 1 U04,7176 TC     2465
+04,7176  02465 1 U04,7176 TC     UNK2465
 04,7177  11760 0 GOPROG   CCS    ERESTORE
 04,7200  07202 0          TC     +2
 04,7201  07212 1          TC     7212
@@ -780,7 +780,7 @@
 04,7413  50725 1          TS     OLDERR
 04,7414  07355 0          TC     U04,7355
 04,7415  35501 0 STARTSUB CAF    ZERO
-04,7416  50757 1          TS     0757
+04,7416  50757 1          TS     0757                ; FIXME SHOULD THESE REALLY BE CONSECUTIVE?
 04,7417  50760 0          TS     0760
 04,7420  50761 1          TS     0761
 04,7421  50762 1          TS     0762
@@ -1130,55 +1130,55 @@
    2043  30015 0          XCH    BANKREG
    2044  06475 1          TC     KEYRUPTA
    2045  30475 1 MODEBANK CADR   KEYRUPTA
-   2046  14000 1          CCS    4000
-   2047  00011 1          TC     0011
-   2050  00013 0          TC     0013
-   2051  00014 1          TC     0014
-   2052  00015 0          TC     0015
-   2053  00016 0          TC     0016
-   2054  00017 1          TC     0017
-   2055  00020 0          TC     0020
-   2056  00021 1          TC     0021
-   2057  00022 1 EIGHTN   TC     0022
-   2060  00023 0          TC     0023
-   2061  00024 1          TC     0024
-   2062  00025 0          TC     0025
-   2063  00026 0          TC     0026
-   2064  00027 1          TC     0027
-   2065  00030 1          TC     0030
-   2066  00031 0          TC     0031
-   2067  00032 0          TC     0032
-   2070  00033 1          TC     0033
-   2071  00034 0          TC     0034
-   2072  00035 1          TC     0035
-   2073  00036 1          TC     0036
-   2074  00050 1          TC     0050
-   2075  00062 0          TC     0062
-   2076  00074 1          TC     0074
-   2077  00144 0          TC     0144
-   2100  00310 0          TC     0310
-   2101  00454 1          TC     0454
-   2102  00620 0          TC     0620
-   2103  00764 1          TC     0764
-   2104  01130 1          TC     1130
-   2105  01750 1          TC     1750
-   2106  03720 1          TC     3720
-   2107  05670 0          TC     5670
+   2046  14000 1 UNK2046  CADR   FLASHON
+   2047  00011 1 NINE     DEC    9
+   2050  00013 0 ELEVEN   OCT    00013
+   2051  00014 1 TWELVE   OCT    00014
+   2052  00015 0 THIRTN   OCT    00015
+   2053  00016 0 FOURTN   OCT    00016
+   2054  00017 1 FIFTN    OCT    00017
+   2055  00020 0 SIXTN    OCT    00020
+   2056  00021 1 SEVENTN  OCT    00021
+   2057  00022 1 EIGHTN   OCT    00022
+   2060  00023 0 NINETEEN DEC    19
+   2061  00024 1 TWENTY0  OCT    00024
+   2062  00025 0 TWENTY1  OCT    00025
+   2063  00026 0 TWENTY2  OCT    00026
+   2064  00027 1 TWENTY3  OCT    00027
+   2065  00030 1 TWENTY4  OCT    00030
+   2066  00031 0 TWENTY5  OCT    00031
+   2067  00032 0 TWENTY6  DEC    26
+   2070  00033 1 TWENTY7  DEC    27
+   2071  00034 0 TWENTY8  DEC    28
+   2072  00035 1 TWENTY9  DEC    29
+   2073  00036 1 THIRTY   DEC    30
+   2074  00050 1 FORTY    DEC    40
+   2075  00062 0 FIFTY    DEC    50
+   2076  00074 1 SIXTY    DEC    60
+   2077  00144 0 100DEC   DEC    100
+   2100  00310 0 200DEC   DEC    200
+   2101  00454 1 300DEC   DEC    300
+   2102  00620 0 400DEC   DEC    400
+   2103  00764 1 500DEC   DEC    500
+   2104  01130 1 600DEC   DEC    600
+   2105  01750 1 1000DEC  DEC    1000
+   2106  03720 1 2000DEC  DEC    2000
+   2107  05670 0 3000DEC  DEC    3000
    2110  02212 1          TC     2212
    2111  53211 0          OVIND  3211
-   2112  00125 1          TC     0125
+   2112  00125 1 UNK2112  TC     0125
    2113  00617 1          TC     0617
-   2114  00633 1          TC     0633
+   2114  00633 1 UNK2114  TC     0633
    2115  00634 0          TC     0634
-   2116  00635 1          TC     0635
+   2116  00635 1 UNK2116  TC     0635
    2117  00644 1          TC     0644
-   2120  00647 1          TC     0647
+   2120  00647 1 UNK2120  TC     0647
    2121  00650 1          TC     0650
    2122  00651 0          TC     0651
    2123  00657 0          TC     0657
-   2124  00670 0          TC     0670
+   2124  00670 0 UNK2124  TC     0670
    2125  01620 1          TC     1620
-   2126  01635 0          TC     1635
+   2126  01635 0 UNK2126  TC     1635
    2127  01642 0          TC     1642
    2130  01650 0          TC     1650
    2131  01651 1          TC     1651
@@ -1246,31 +1246,31 @@
    2225  32163 1          CAF    EXECBANK
    2226  30015 0          XCH    BANKREG
    2227  06356 1          TC     PRIOCH2
-   2230  03000 1 PRIO3    OCT    3000
-   2231  05000 1 PRIO5    OCT    5000
-   2232  07000 0 PRIO7    OCT    7000
-   2233  11000 1 PRIO11   OCT    1000
-   2234  12000 1 PRIO12   OCT    2000
-   2235  13000 0 PRIO13   OCT    3000
-   2236  14000 1 PRIO14   OCT    4000
-   2237  15000 0 PRIO15   OCT    5000
-   2240  16000 0 PRIO16   OCT    6000
-   2241  17000 1 PRIO17   OCT    7000
-   2242  21000 1 PRIO21   OCT    1000
-   2243  22000 1 PRIO22   OCT    2000
-   2244  23000 0 PRIO23   OCT    3000
-   2245  24000 1 PRIO24   OCT    4000
-   2246  25000 0 PRIO25   OCT    5000
-   2247  26000 0 PRIO26   OCT    6000
-   2250  27000 1 PRIO27   OCT    7000
-   2251  30000 1 PRIO30   OCT    0000
-   2252  31000 0 PRIO31   OCT    1000
-   2253  32000 0 PRIO32   OCT    2000
-   2254  33000 1 PRIO33   OCT    3000
-   2255  34000 0 PRIO34   OCT    4000
-   2256  35000 1 PRIO35   OCT    5000
-   2257  36000 1 PRIO36   OCT    6000
-   2260  37000 0 PRIO37   OCT    7000
+   2230  03000 1 PRIO3    OCT    03000
+   2231  05000 1 PRIO5    OCT    05000
+   2232  07000 0 PRIO7    OCT    07000
+   2233  11000 1 PRIO11   OCT    11000
+   2234  12000 1 PRIO12   OCT    12000
+   2235  13000 0 PRIO13   OCT    13000
+   2236  14000 1 PRIO14   OCT    14000
+   2237  15000 0 PRIO15   OCT    15000
+   2240  16000 0 PRIO16   OCT    16000
+   2241  17000 1 PRIO17   OCT    17000
+   2242  21000 1 PRIO21   OCT    21000
+   2243  22000 1 PRIO22   OCT    22000
+   2244  23000 0 PRIO23   OCT    23000
+   2245  24000 1 PRIO24   OCT    24000
+   2246  25000 0 PRIO25   OCT    25000
+   2247  26000 0 PRIO26   OCT    26000
+   2250  27000 1 PRIO27   OCT    27000
+   2251  30000 1 PRIO30   OCT    30000
+   2252  31000 0 PRIO31   OCT    31000
+   2253  32000 0 PRIO32   OCT    32000
+   2254  33000 1 PRIO33   OCT    33000
+   2255  34000 0 PRIO34   OCT    34000
+   2256  35000 1 PRIO35   OCT    35000
+   2257  36000 1 PRIO36   OCT    36000
+   2260  37000 0 PRIO37   OCT    37000
    2261  50577 1 WAITLIST TS     DELT
    2262  30001 0          XCH    Q
    2263  02153 1          TC     EXECCOM
@@ -1733,7 +1733,7 @@
    3173  51764 0          TS     SFAIL
    3174  03154 1          TC     ABORT
    3175  01103 1          OCT    1103
-   3176  00001 0          TC     Q                   ; FIXME ABORT SHOULDN'T RETURN
+   3176  00001 0 UNK3176  TC     Q                   ; FIXME ABORT SHOULDN'T RETURN
    3177  33205 0 PASTEVB  CAF    MIDSIX
    3200  70625 1          MASK   MONSAVE
    3201  50110 1          TS     NVTEMP
@@ -1741,15 +1741,15 @@
    3203  03204 1          TC     +1
    3204  02212 1          TC     ENDOFJOB
    3205  07700 1 MIDSIX   OCT    07700
-   3206  03444 0 UNK3206  TC     UNK3444
+   3206  03444 0 ALMCYCLE TC     FALTON
    3207  10215 0          CCS    NEWJOB
    3210  02167 0          TC     CHANG1
-   3211  40633 0          CS     CLPASS              ; FIXME
-   3212  50613 0          TS     REQRET              ; FIXME
+   3211  40633 0          CS     VERBSAVE
+   3212  50613 0          TS     REQRET
    3213  05654 0          TC     BANKCALL
    3214  16337 1          CADR   UPDATVB -1
    3215  05720 1          TC     POSTJUMP
-   3216  16006 0          CADR   U07,6006
+   3216  16006 0          CADR   ENTER
    3217  50110 1 NVSUB    TS     NVTEMP
    3220  34513 1          CAF    BIT4
    3221  70643 1          MASK   DSPLOCK
@@ -1782,7 +1782,7 @@
    3254  00001 0          TC     Q
    3255  30001 0 ENDIDLE  XCH    Q
    3256  50071 1          TS     TEMQS
-   3257  03271 0          TC     RECALTST
+   3257  03271 0          TC     UNK3271
    3260  03275 1          TC     UNK3275
    3261  30015 0          XCH    BANKREG
    3262  50072 1          TS     BANKTEM
@@ -1792,14 +1792,14 @@
    3266  02215 0          TC     JOBSLEEP
    3267  02212 1 ENDINST  TC     ENDOFJOB
    3270  05777 0 BNKCON   OCT    5777
-   3271  10627 0 RECALTST CCS    CADRSTOR
-   3272  03300 1          TC     LSTFULL
+   3271  10627 0 ISCADR+0 CCS    CADRSTOR
+   3272  03300 1          TC     DSPABORT
    3273  00001 0          TC     Q
-   3274  03300 1          TC     LSTFULL
-   3275  10634 1 UNK3275  CCS    UNK0634
-   3276  03300 1          TC     LSTFULL
+   3274  03300 1          TC     DSPABORT
+   3275  10634 1 ISLIST+0 CCS    DSPLIST
+   3276  03300 1          TC     DSPABORT
    3277  00001 0          TC     Q
-   3300  03154 1 LSTFULL  TC     ABORT
+   3300  03154 1 DSPABORT TC     ABORT
    3301  01206 1          OCT    01206
    3302  33310 0 JAMTERM  CAF    TWENTY8
    3303  50613 0          TS     REQRET
@@ -1853,7 +1853,7 @@
    3363  14544 1 UNK3363  CADR   U06,6544
    3364  00016 0 R1D1     OCT    16
    3365  00011 1 R2D1     OCT    11
-   3366  00004 0          OCT    4
+   3366  00004 0 R3D1     OCT    4
    3367  50020 0 RIGHT5   TS     CYR
    3370  40020 1          CS     CYR
    3371  40020 1          CS     CYR
@@ -1874,7 +1874,7 @@
    3410  60000 1          DOUBLE
    3411  60000 1          DOUBLE
    3412  00001 0          TC     Q
-   3413  30117 0 UNK3413  XCH    MPAC +2
+   3413  30117 0 SL1      XCH    MPAC +2
    3414  60000 1          DOUBLE
    3415  50117 0          TS     MPAC +2
    3416  35501 0          CAF    ZERO
@@ -1947,11 +1947,11 @@
    3520  06003 1 6K+3     OCT    6003
    3521  30001 0 RELDSP   XCH    Q
    3522  50113 1          TS     RELRET
-   3523  10634 1          CCS    UNK0634
+   3523  10634 1          CCS    DSPLIST
    3524  03526 0          TC     +2
    3525  03532 0          TC     RELDSP2
    3526  35501 0          CAF    ZERO
-   3527  30634 0          XCH    UNK0634
+   3527  30634 0          XCH    DSPLIST
    3530  20017 0          INHINT 
    3531  02146 0          TC     JOBWAKE
    3532  44514 1 RELDSP2  CS     BIT3
@@ -1961,7 +1961,7 @@
    3536  00113 1          TC     RELRET
    3537  30001 0 RELDSP1  XCH    Q
    3540  50113 1          TS     RELRET
-   3541  10634 1          CCS    UNK0634
+   3541  10634 1          CCS    DSPLIST
    3542  03535 1          TC     RELDSP2 +3
    3543  03545 0          TC     +2
    3544  03535 1          TC     RELDSP2 +3
@@ -2120,262 +2120,262 @@
    3775  00000 0          TC     0000      ; PARITY ERROR
    3776  00000 0          TC     0000      ; PARITY ERROR
    3777  00000 0          TC     0000      ; PARITY ERROR
-24,6000  30647 0          XCH    0647      ; PARITY ERROR
-24,6001  16002 0          CCS    6002      ; PARITY ERROR
-24,6002  16413 1          CCS    6413      ; PARITY ERROR
-24,6003  16156 0          CCS    6156      ; PARITY ERROR
-24,6004  16156 0          CCS    6156      ; PARITY ERROR
-24,6005  16156 0          CCS    6156      ; PARITY ERROR
-24,6006  16156 0          CCS    6156      ; PARITY ERROR
-24,6007  16156 0          CCS    6156      ; PARITY ERROR
-24,6010  15706 0          CCS    5706      ; PARITY ERROR
-24,6011  50062 1          TS     0062      ; PARITY ERROR
+24,6000  20647 0 U24,6000 INDEX  PHASE1
+24,6001  06002 0          TC     +1
+24,6002  06413 1          TC     6413
+24,6003  06156 0          TC     6156
+24,6004  06156 0          TC     6156
+24,6005  06156 0          TC     6156
+24,6006  06156 0          TC     6156
+24,6007  06156 0          TC     6156
+24,6010  05706 0          TC     5706
+24,6011  40062 1          CS     0062
 24,6012  51361 1          TS     1361
-24,6013  14000 0          CCS    4000      ; PARITY ERROR
-24,6014  76776 0          MASK   6776
-24,6015  10071 0          CCS    0071
-24,6016  76776 0          MASK   6776
-24,6017  10123 0          CCS    0123
-24,6020  77576 0          MASK   7576
-24,6021  17206 1          CCS    7206      ; PARITY ERROR
-24,6022  51361 0          TS     1361      ; PARITY ERROR
+24,6013  04000 0          TC     INTPRET
+24,6014  76776 0          ITC    0
+24,6015  10071 0                 U24,6070
+24,6016  76776 0          ITC    0
+24,6017  10123 0                 U24,6122
+24,6020  77576 0          EXIT   0
+24,6021  07206 1          TC     U24,7206
+24,6022  41361 0          CS     1361
 24,6023  15733 1          CCS    5733
 24,6024  75176 0          MASK   5176
 24,6025  12720 1          CCS    2720
 24,6026  33233 0          CAF    3233
-24,6027  57576 0          OVIND  7576      ; PARITY ERROR
+24,6027  47576 0          CS     7576
 24,6030  33241 0          CAF    3241
 24,6031  77576 0          MASK   7576
 24,6032  36252 1          CAF    6252
-24,6033  13217 0          CCS    3217      ; PARITY ERROR
-24,6034  13513 0          CCS    3513      ; PARITY ERROR
-24,6035  13320 0          CCS    3320      ; PARITY ERROR
-24,6036  16413 1          CCS    6413      ; PARITY ERROR
-24,6037  16040 0          CCS    6040      ; PARITY ERROR
+24,6033  03217 0          TC     3217
+24,6034  03513 0          TC     3513
+24,6035  03320 0          TC     3320
+24,6036  06413 1          TC     6413
+24,6037  06040 0          TC     6040
 24,6040  36253 0          CAF    6253
-24,6041  13217 0          CCS    3217      ; PARITY ERROR
-24,6042  13513 0          CCS    3513      ; PARITY ERROR
-24,6043  13320 0          CCS    3320      ; PARITY ERROR
-24,6044  16413 1          CCS    6413      ; PARITY ERROR
-24,6045  16046 0          CCS    6046      ; PARITY ERROR
-24,6046  14000 0          CCS    4000      ; PARITY ERROR
+24,6041  03217 0          TC     3217
+24,6042  03513 0          TC     3513
+24,6043  03320 0          TC     3320
+24,6044  06413 1          TC     6413
+24,6045  06046 0          TC     6046
+24,6046  04000 0          TC     4000
 24,6047  50776 1          TS     0776
-24,6050  10775 1          CCS    0775      ; PARITY ERROR
-24,6051  11233 1          CCS    1233      ; PARITY ERROR
+24,6050  00775 1          TC     0775
+24,6051  01233 1          TC     1233
 24,6052  32775 0          CAF    2775
-24,6053  57576 0          OVIND  7576      ; PARITY ERROR
+24,6053  47576 0          CS     7576
 24,6054  33025 0          CAF    3025
 24,6055  50776 1          TS     0776
-24,6056  11003 0          CCS    1003      ; PARITY ERROR
-24,6057  11241 1          CCS    1241      ; PARITY ERROR
+24,6056  01003 0          TC     1003
+24,6057  01241 1          TC     1241
 24,6060  33003 1          CAF    3003
-24,6061  57576 0          OVIND  7576      ; PARITY ERROR
+24,6061  47576 0          CS     7576
 24,6062  33033 1          CAF    3033
 24,6063  77576 0          MASK   7576
-24,6064  54516 0          OVIND  4516      ; PARITY ERROR
-24,6065  12400 1          CCS    2400      ; PARITY ERROR
-24,6066  10001 0          CCS    0001      ; PARITY ERROR
-24,6067  12212 1          CCS    2212      ; PARITY ERROR
-24,6070  55576 1          OVIND  5576      ; PARITY ERROR
-24,6071  11363 0          CCS    1363      ; PARITY ERROR
+24,6064  44516 0          CS     4516
+24,6065  02400 1          TC     2400
+24,6066  00001 0          TC     0001
+24,6067  02212 1          TC     2212
+24,6070  45576 1 U24,6070 CS     5576
+24,6071  01363 0          TC     1363
 24,6072  75175 0          MASK   5175
 24,6073  75465 1          MASK   5465
 24,6074  12720 1          CCS    2720
-24,6075  10015 0          CCS    0015      ; PARITY ERROR
-24,6076  10007 0          CCS    0007      ; PARITY ERROR
+24,6075  00015 0          TC     0015
+24,6076  00007 0          TC     0007
 24,6077  33175 1          CAF    3175
-24,6100  57576 0          OVIND  7576      ; PARITY ERROR
+24,6100  47576 0          CS     7576
 24,6101  33203 0          CAF    3203
 24,6102  75375 1          MASK   5375
 24,6103  51622 0          TS     1622
-24,6104  12335 0          CCS    2335      ; PARITY ERROR
-24,6105  30561 1          XCH    0561      ; PARITY ERROR
-24,6106  11061 1          CCS    1061      ; PARITY ERROR
-24,6107  10003 1          CCS    0003      ; PARITY ERROR
+24,6104  02335 0          TC     2335
+24,6105  20561 1          INDEX  0561
+24,6106  01061 1          TC     1061
+24,6107  00003 1          TC     0003
 24,6110  36451 1          CAF    6451
 24,6111  51576 1          TS     1576
 24,6112  10103 1          CCS    0103
-24,6113  55176 0          OVIND  5176      ; PARITY ERROR
-24,6114  11114 1          CCS    1114      ; PARITY ERROR
+24,6113  45176 0          CS     5176
+24,6114  01114 1          TC     1114
 24,6115  33227 0          CAF    3227
 24,6116  76776 0          MASK   6776
-24,6117  17135 1          CCS    7135      ; PARITY ERROR
-24,6120  54576 0          OVIND  4576      ; PARITY ERROR
-24,6121  11363 0          CCS    1363      ; PARITY ERROR
-24,6122  75175 0          MASK   5175
+24,6117  07135 1          TC     7135
+24,6120  44576 0          CS     4576
+24,6121  01363 0          TC     1363
+24,6122  75175 0 U24,6122 MASK   5175
 24,6123  75465 1          MASK   5465
 24,6124  12720 1          CCS    2720
-24,6125  10111 0          CCS    0111      ; PARITY ERROR
-24,6126  10007 0          CCS    0007      ; PARITY ERROR
-24,6127  57576 0          OVIND  7576      ; PARITY ERROR
+24,6125  00111 0          TC     0111
+24,6126  00007 0          TC     0007
+24,6127  47576 0          CS     7576
 24,6130  37721 1          CAF    7721
 24,6131  51576 1          TS     1576
 24,6132  10130 1          CCS    0130
-24,6133  55176 0          OVIND  5176      ; PARITY ERROR
+24,6133  45176 0          CS     5176
 24,6134  10153 1          CCS    0153
 24,6135  33641 1          CAF    3641
-24,6136  57576 0          OVIND  7576      ; PARITY ERROR
+24,6136  47576 0          CS     7576
 24,6137  33651 0          CAF    3651
-24,6140  57576 0          OVIND  7576      ; PARITY ERROR
+24,6140  47576 0          CS     7576
 24,6141  33661 0          CAF    3661
-24,6142  55176 0          OVIND  5176      ; PARITY ERROR
+24,6142  45176 0          CS     5176
 24,6143  10155 1          CCS    0155
 24,6144  33727 0          CAF    3727
-24,6145  57576 0          OVIND  7576      ; PARITY ERROR
+24,6145  47576 0          CS     7576
 24,6146  33737 1          CAF    3737
-24,6147  57576 0          OVIND  7576      ; PARITY ERROR
+24,6147  47576 0          CS     7576
 24,6150  33747 0          CAF    3747
-24,6151  50576 1          TS     0576      ; PARITY ERROR
-24,6152  10400 0          CCS    0400      ; PARITY ERROR
-24,6153  10000 1          CCS    0000      ; PARITY ERROR
-24,6154  10152 1          CCS    0152      ; PARITY ERROR
+24,6151  40576 1          CS     0576
+24,6152  00400 0          TC     0400
+24,6153  00000 1          TC     0000
+24,6154  00152 1          TC     0152
 24,6155  11324 1          CCS    1324
-24,6156  54516 0          OVIND  4516      ; PARITY ERROR
-24,6157  70647 1          MASK   0647      ; PARITY ERROR
+24,6156  44516 0          CS     4516
+24,6157  60647 1          AD     0647
 24,6160  51362 1          TS     1362
 24,6161  37456 1          CAF    7456
 24,6162  70766 1          MASK   0766
-24,6163  31362 0          XCH    1362      ; PARITY ERROR
-24,6164  76270 1          MASK   6270      ; PARITY ERROR
+24,6163  21362 0          INDEX  1362
+24,6164  66270 1          AD     6270
 24,6165  50766 0          TS     0766
-24,6166  12364 1          CCS    2364      ; PARITY ERROR
-24,6167  11101 0          CCS    1101      ; PARITY ERROR
-24,6170  50766 1          TS     0766      ; PARITY ERROR
+24,6166  02364 1          TC     2364
+24,6167  01101 0          TC     1101
+24,6170  40766 1          CS     0766
 24,6171  74507 0          MASK   4507
 24,6172  10000 0          CCS    0000
-24,6173  16212 0          CCS    6212      ; PARITY ERROR
-24,6174  15654 0          CCS    5654      ; PARITY ERROR
+24,6173  06212 0          TC     6212
+24,6174  05654 0          TC     5654
 24,6175  30171 0          XCH    0171
-24,6176  15654 0          CCS    5654      ; PARITY ERROR
+24,6176  05654 0          TC     5654
 24,6177  30345 0          XCH    0345
-24,6200  16413 1          CCS    6413      ; PARITY ERROR
+24,6200  06413 1          TC     6413
 24,6201  37442 1          CAF    7442
 24,6202  50646 0          TS     0646
 24,6203  32047 0          CAF    2047
-24,6204  15654 0          CCS    5654      ; PARITY ERROR
+24,6204  05654 0          TC     5654
 24,6205  31551 1          XCH    1551
-24,6206  16413 1          CCS    6413      ; PARITY ERROR
-24,6207  16632 0          CCS    6632      ; PARITY ERROR
-24,6210  16605 1          CCS    6605      ; PARITY ERROR
-24,6211  13444 0          CCS    3444      ; PARITY ERROR
+24,6206  06413 1          TC     6413
+24,6207  06632 0          TC     6632
+24,6210  06605 1          TC     6605
+24,6211  03444 0          TC     3444
 24,6212  37456 1          CAF    7456
 24,6213  70766 1          MASK   0766
 24,6214  10000 0          CCS    0000
-24,6215  16231 1          CCS    6231      ; PARITY ERROR
+24,6215  06231 1          TC     6231
 24,6216  37620 1          CAF    7620
-24,6217  13217 0          CCS    3217      ; PARITY ERROR
-24,6220  13513 0          CCS    3513      ; PARITY ERROR
-24,6221  13320 0          CCS    3320      ; PARITY ERROR
-24,6222  16413 1          CCS    6413      ; PARITY ERROR
-24,6223  16211 0          CCS    6211      ; PARITY ERROR
-24,6224  14000 0          CCS    4000      ; PARITY ERROR
-24,6225  55176 0          OVIND  5176      ; PARITY ERROR
-24,6226  10617 1          CCS    0617      ; PARITY ERROR
+24,6217  03217 0          TC     3217
+24,6220  03513 0          TC     3513
+24,6221  03320 0          TC     3320
+24,6222  06413 1          TC     6413
+24,6223  06211 0          TC     6211
+24,6224  04000 0          TC     4000
+24,6225  45176 0          CS     5176
+24,6226  00617 1          TC     0617
 24,6227  33347 1          CAF    3347
 24,6230  77576 0          MASK   7576
-24,6231  12364 1          CCS    2364      ; PARITY ERROR
-24,6232  11201 0          CCS    1201      ; PARITY ERROR
+24,6231  02364 1          TC     2364
+24,6232  01201 0          TC     1201
 24,6233  51363 0          TS     1363
-24,6234  17512 0          CCS    7512      ; PARITY ERROR
-24,6235  16275 1          CCS    6275      ; PARITY ERROR
-24,6236  16525 0          CCS    6525      ; PARITY ERROR
-24,6237  14000 0          CCS    4000      ; PARITY ERROR
-24,6240  16243 1          CCS    6243      ; PARITY ERROR
+24,6234  07512 0          TC     7512
+24,6235  06275 1          TC     6275
+24,6236  06525 0          TC     6525
+24,6237  04000 0          TC     4000
+24,6240  06243 1          TC     6243
 24,6241  32051 1          CAF    2051
 24,6242  51363 0          TS     1363
-24,6243  50766 1          TS     0766      ; PARITY ERROR
+24,6243  40766 1          CS     0766
 24,6244  76721 1          MASK   6721
 24,6245  10000 0          CCS    0000
-24,6246  16275 1          CCS    6275      ; PARITY ERROR
-24,6247  13102 1          CCS    3102      ; PARITY ERROR
-24,6250  10123 1          CCS    0123      ; PARITY ERROR
-24,6251  16413 1          CCS    6413      ; PARITY ERROR
-24,6252  12572 0          CCS    2572      ; PARITY ERROR
-24,6253  12573 1          CCS    2573      ; PARITY ERROR
-24,6254  30304 1          XCH    0304      ; PARITY ERROR
-24,6255  33351 1          CAF    3351      ; PARITY ERROR
-24,6256  10000 1          CCS    0000      ; PARITY ERROR
+24,6246  06275 1          TC     6275
+24,6247  03102 1          TC     3102
+24,6250  00123 1          TC     0123
+24,6251  06413 1          TC     6413
+24,6252  02572 0          TC     2572
+24,6253  02573 1          TC     2573
+24,6254  20304 1          INDEX  0304
+24,6255  23351 1          INDEX  3351
+24,6256  00000 1          TC     0000
 24,6257  37352 1          CAF    7352
 24,6260  37200 1          CAF    7200
-24,6261  10000 1          CCS    0000      ; PARITY ERROR
-24,6262  34605 1          CAF    4605      ; PARITY ERROR
+24,6261  00000 1          TC     0000
+24,6262  24605 1          INDEX  4605
 24,6263  15301 1          CCS    5301
 24,6264  12317 1          CCS    2317
-24,6265  10451 1          CCS    0451      ; PARITY ERROR
+24,6265  00451 1          TC     0451
 24,6266  30523 0          XCH    0523
-24,6267  10147 0          CCS    0147      ; PARITY ERROR
+24,6267  00147 0          TC     0147
 24,6270  12000 1          CCS    2000
 24,6271  12200 0          CCS    2200
 24,6272  50010 0          TS     0010
 24,6273  10040 1          CCS    0040
 24,6274  11000 1          CCS    1000
-24,6275  50766 1          TS     0766      ; PARITY ERROR
+24,6275  40766 1          CS     0766
 24,6276  76674 0          MASK   6674
 24,6277  10000 0          CCS    0000
-24,6300  16306 1          CCS    6306      ; PARITY ERROR
-24,6301  30017 0          XCH    0017      ; PARITY ERROR
+24,6300  06306 1          TC     6306
+24,6301  20017 0          INHINT 
 24,6302  34373 1          CAF    4373
-24,6303  12140 0          CCS    2140      ; PARITY ERROR
+24,6303  02140 0          TC     2140
 24,6304  51306 0          TS     1306
-24,6305  30016 1          XCH    0016      ; PARITY ERROR
+24,6305  20016 1          RELINT 
 24,6306  36535 1          CAF    6535
 24,6307  70766 1          MASK   0766
 24,6310  10000 0          CCS    0000
-24,6311  16536 1          CCS    6536      ; PARITY ERROR
-24,6312  17222 1          CCS    7222      ; PARITY ERROR
-24,6313  16322 1          CCS    6322      ; PARITY ERROR
+24,6311  06536 1          TC     6536
+24,6312  07222 1          TC     7222
+24,6313  06322 1          TC     6322
 24,6314  77576 0          MASK   7576
-24,6315  17511 0          CCS    7511      ; PARITY ERROR
+24,6315  07511 0          TC     7511
 24,6316  36403 0          CAF    6403
 24,6317  70766 1          MASK   0766
 24,6320  10000 0          CCS    0000
-24,6321  16237 1          CCS    6237      ; PARITY ERROR
+24,6321  06237 1          TC     6237
 24,6322  37516 1          CAF    7516
 24,6323  70766 1          MASK   0766
 24,6324  10000 0          CCS    0000
-24,6325  16331 0          CCS    6331      ; PARITY ERROR
+24,6325  06331 0          TC     6331
 24,6326  35501 0          CAF    5501
 24,6327  51363 0          TS     1363
-24,6330  16336 1          CCS    6336      ; PARITY ERROR
-24,6331  51363 1          TS     1363      ; PARITY ERROR
-24,6332  50000 0          TS     0000      ; PARITY ERROR
-24,6333  17512 0          CCS    7512      ; PARITY ERROR
+24,6330  06336 1          TC     6336
+24,6331  41363 1          CS     1363
+24,6332  40000 0          CS     0000
+24,6333  07512 0          TC     7512
 24,6334  34516 1          CAF    4516
 24,6335  51363 0          TS     1363
-24,6336  14000 0          CCS    4000      ; PARITY ERROR
+24,6336  04000 0          TC     4000
 24,6337  72776 1          MASK   2776
-24,6340  10123 1          CCS    0123      ; PARITY ERROR
-24,6341  76774 0          MASK   6774      ; PARITY ERROR
-24,6342  73712 0          MASK   3712      ; PARITY ERROR
+24,6340  00123 1          TC     0123
+24,6341  66774 0          AD     6774
+24,6342  63712 0          AD     3712
 24,6343  75535 0          MASK   5535
-24,6344  11347 0          CCS    1347      ; PARITY ERROR
-24,6345  11227 1          CCS    1227      ; PARITY ERROR
-24,6346  10014 1          CCS    0014      ; PARITY ERROR
-24,6347  17420 0          CCS    7420      ; PARITY ERROR
+24,6344  01347 0          TC     1347
+24,6345  01227 1          TC     1227
+24,6346  00014 1          TC     0014
+24,6347  07420 0          TC     7420
 24,6350  10315 1          CCS    0315
-24,6351  11365 0          CCS    1365      ; PARITY ERROR
+24,6351  01365 0          TC     1365
 24,6352  33343 0          CAF    3343
 24,6353  71773 1          MASK   1773
-24,6354  75132 1          MASK   5132      ; PARITY ERROR
+24,6354  65132 1          AD     5132
 24,6355  73742 1          MASK   3742
-24,6356  76756 0          MASK   6756      ; PARITY ERROR
+24,6356  66756 0          AD     6756
 24,6357  10367 1          CCS    0367
-24,6360  11343 1          CCS    1343      ; PARITY ERROR
+24,6360  01343 1          TC     1343
 24,6361  10257 0          CCS    0257
 24,6362  10534 1          CCS    0534
 24,6363  10257 0          CCS    0257
 24,6364  10265 1          CCS    0265
-24,6365  17101 0          CCS    7101      ; PARITY ERROR
-24,6366  55175 0          OVIND  5175      ; PARITY ERROR
+24,6365  07101 0          TC     7101
+24,6366  45175 0          CS     5175
 24,6367  53776 1          OVIND  3776
 24,6370  10265 1          CCS    0265
-24,6371  11343 1          CCS    1343      ; PARITY ERROR
+24,6371  01343 1          TC     1343
 24,6372  33343 0          CAF    3343
 24,6373  76776 0          MASK   6776
-24,6374  17101 0          CCS    7101      ; PARITY ERROR
+24,6374  07101 0          TC     7101
 24,6375  77576 0          MASK   7576
-24,6376  12364 1          CCS    2364      ; PARITY ERROR
-24,6377  11601 1          CCS    1601      ; PARITY ERROR
+24,6376  02364 1          TC     2364
+24,6377  01601 1          TC     1601
 24,6400  07516 0          TC     7516      ; PARITY ERROR
 24,6401  06414 1          TC     6414      ; PARITY ERROR
 24,6402  06515 0          TC     6515
