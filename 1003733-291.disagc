@@ -1733,7 +1733,7 @@
    3173  51764 0          TS     SFAIL
    3174  03154 1          TC     ABORT
    3175  01103 1          OCT    1103
-   3176  00001 0 UNK3176  TC     Q                   ; FIXME ABORT SHOULDN'T RETURN
+   3176  00001 0 CURTAINS TC     Q
    3177  33205 0 PASTEVB  CAF    MIDSIX
    3200  70625 1          MASK   MONSAVE
    3201  50110 1          TS     NVTEMP
